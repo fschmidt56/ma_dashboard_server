@@ -1,4 +1,4 @@
-import { pool } from './config/config';
+import { pool, geoserverHeaders, geoserverWfsUrl } from './config/config';
 import crypto from 'crypto-js'
 import {
   borderQuery,
@@ -8,7 +8,9 @@ import {
   chartQuery,
   qMaxAffected,
   qMinAffected,
+  qUserInfo,
 } from './config/sql';
+import fetch from 'node-fetch';
 
 export const getBoundaries = (request: any, response: any) => {
   pool.query(borderQuery, (error, results) => {
@@ -105,6 +107,26 @@ export const getMaxAffectedDistrict = (request: any, response: any) => {
 
 export const getMinAffectedDistrict = (request: any, response: any) => {
   pool.query(qMinAffected, (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).send(results.rows)
+  })
+}
+
+export const updateGeoserver = (request: any, response: any) => {
+  const xml = request.body.xml;
+  fetch(geoserverWfsUrl, {
+    method: 'POST',
+    headers: geoserverHeaders,
+    body: xml,
+  })
+    .then(data => response.status(200).send(data))
+    .catch(err => console.log(err))
+}
+
+export const getUserInfos = (request: any, response: any) => {
+  pool.query(qUserInfo, (error, results) => {
     if (error) {
       throw error
     }

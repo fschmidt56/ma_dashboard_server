@@ -52,3 +52,7 @@ export const qMinAffected = `SELECT count(id) as anzahl, stt_name
   ORDER BY anzahl ASC
   LIMIT 10;`;
 
+export const qUserInfo = `SELECT count(id)
+FROM nabu.hu_koeln
+WHERE edited_by != 'default'
+GROUP BY edited_by;`

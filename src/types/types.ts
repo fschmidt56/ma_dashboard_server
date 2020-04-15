@@ -27,5 +27,11 @@ export interface IRouteApiObject {
     preference: TRoutePreference,
 }
 
+export interface ITransactionsCredentials<T> {
+    username: T,
+    password: T,
+    connectionString: T,
+}
+
 //types
 export type TRoutePreference = "shortest" | "fastest" | "recommended"
