@@ -36,8 +36,8 @@ export const maxAffectedQuery = `SELECT count(id), stt_name FROM nabu.hu_koeln W
 export const minAffectedQuery = `SELECT count(id), stt_name FROM nabu.hu_koeln WHERE visited=true GROUP BY stt_name ORDER BY count ASC LIMIT 10;`;
 export const minMaxCasesQuery = `SELECT min(a.count), max(a.count) FROM (SELECT count(id) as count FROM nabu.hu_koeln WHERE visited= true GROUP BY stt_name) as a`;
 export const districtNamesQuery = `SELECT stt_name FROM nabu.koeln ORDER BY stt_name;`;
-export const chartQuery = `SELECT sum(visited::int)*100/count(id) as besucht,
-  100-(sum(visited::int)*100/count(id)) as unbesucht
+export const chartQuery = `SELECT round(sum(visited::int::numeric(1,0))*100/count(id), 5) as besucht,
+100-(round(sum(visited::int::numeric(1,0))*100/count(id), 5)) as unbesucht
   FROM nabu.hu_koeln`;
 export const qMaxAffected = `SELECT count(id) as anzahl, stt_name 
   FROM nabu.hu_koeln

@@ -59,8 +59,8 @@ export const getDistrictInfo = (request: any, response: any) => {
   const districtInfoQuery = `SELECT count(id) as anzahl, 
   sum(visited::int) as besucht, 
   count(id)-sum(visited::int) as unbesucht,
-  sum(visited::int)*100/count(id) as besuchtP,
-  100-(sum(visited::int)*100/count(id)) as unbesuchtP
+  round(sum(visited::int::numeric(1,0))*100/count(id), 5) as besuchtP,
+  100-(round(sum(visited::int::numeric(1,0))*100/count(id), 5)) as unbesuchtP
   FROM nabu.hu_koeln WHERE stt_name = $1`;
   pool.query(districtInfoQuery, [stt_name], (error, results) => {
     if (error) {
@@ -81,8 +81,8 @@ export const getChart = (request: any, response: any) => {
 
 export const getChartDistrict = (request: any, response: any) => {
   const stt_name = request.query.stt_name;
-  pool.query(`SELECT sum(visited::int)*100/count(id) as besucht,
-  100-(sum(visited::int)*100/count(id)) as unbesucht
+  pool.query(`SELECT round(sum(visited::int::numeric(1,0))*100/count(id), 5) as besucht,
+  100-(round(sum(visited::int::numeric(1,0))*100/count(id), 5)) as unbesucht
   FROM nabu.hu_koeln WHERE stt_name = $1`, [stt_name], (error, results) => {
     if (error) {
       throw error
