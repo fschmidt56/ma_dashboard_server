@@ -26,32 +26,30 @@ exports.absoluteCasesQuery = `SELECT jsonb_build_object(
       'properties', to_jsonb(inputs) - 'geom'
     ) AS feature
     FROM (
-      SELECT count(b.id), a.geom, a.stt_name  from nabu.hu_koeln b, nabu.koeln a
-      WHERE b.visited=true AND ST_WITHIN(b.geom, a.geom)
-      GROUP BY a.stt_name, a.geom
-      ORDER BY count DESC
+      SELECT id, geom, stt_name, counter
+      FROM nabu.koeln
+      WHERE counter != 0
+      ORDER BY counter DESC
     ) inputs
   ) features;`;
 exports.maxAffectedQuery = `SELECT count(id), stt_name FROM nabu.hu_koeln WHERE visited=true GROUP BY stt_name ORDER BY count DESC LIMIT 10;`;
 exports.minAffectedQuery = `SELECT count(id), stt_name FROM nabu.hu_koeln WHERE visited=true GROUP BY stt_name ORDER BY count ASC LIMIT 10;`;
-exports.minMaxCasesQuery = `SELECT min(a.count), max(a.count) FROM (SELECT count(id) as count FROM nabu.hu_koeln WHERE visited= true GROUP BY stt_name) as a`;
+exports.minMaxCasesQuery = `SELECT min(counter), max(counter) FROM nabu.koeln;`;
 exports.districtNamesQuery = `SELECT stt_name FROM nabu.koeln ORDER BY stt_name;`;
-exports.chartQuery = `SELECT round(sum(visited::int::numeric(1,0))*100/count(id), 5) as besucht,
-100-(round(sum(visited::int::numeric(1,0))*100/count(id), 5)) as unbesucht
-  FROM nabu.hu_koeln`;
-exports.qMaxAffected = `SELECT count(id) as anzahl, stt_name 
-  FROM nabu.hu_koeln
-  WHERE visited = true
-  GROUP BY stt_name
+exports.chartQuery = `SELECT round(sum(b.counter::numeric)/count(a.id),5) as besucht,
+100-round(sum(b.counter::numeric)/count(a.id),5) as unbesucht
+  FROM nabu.koeln b, nabu.hu_koeln a`;
+exports.qMaxAffected = `SELECT counter as anzahl, stt_name 
+  FROM nabu.koeln
+  WHERE counter > 0
   ORDER BY anzahl DESC
   LIMIT 10;`;
-exports.qMinAffected = `SELECT count(id) as anzahl, stt_name 
-  FROM nabu.hu_koeln
-  WHERE visited = true
-  GROUP BY stt_name
+exports.qMinAffected = `SELECT counter as anzahl, stt_name 
+  FROM nabu.koeln
+  WHERE COUNTER > 0
   ORDER BY anzahl ASC
   LIMIT 10;`;
-exports.qUserInfo = `SELECT count(id)
-FROM nabu.hu_koeln
-WHERE edited_by != 'default'
-GROUP BY edited_by;`;
+exports.qUserInfo = `SELECT count(id) as count, sum(counter) as summe
+FROM nabu.koeln_user
+WHERE pseudo != 'default'
+GROUP BY pseudo;`;

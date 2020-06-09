@@ -8,6 +8,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const express_xml_bodyparser_1 = __importDefault(require("express-xml-bodyparser"));
 const cors_1 = __importDefault(require("cors"));
+const path_1 = __importDefault(require("path"));
 const queries_1 = require("./queries");
 dotenv_1.default.config();
 const app = express_1.default();
@@ -27,6 +28,8 @@ app.use(function (request, response, next) {
     response.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Access-Control-Allow-Headers, Content-Type, Authorization, Origin, Accept");
     next();
 });
+app.use(express_1.default.static(path_1.default.join(__dirname, 'static')));
+app.use("/static", express_1.default.static(__dirname + '/static'));
 app.get('/', (request, response) => {
     response.sendFile(__dirname + '/index.html');
 });

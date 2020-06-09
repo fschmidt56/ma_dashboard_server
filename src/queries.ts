@@ -56,12 +56,15 @@ export const getDistricts = (request: any, response: any) => {
 
 export const getDistrictInfo = (request: any, response: any) => {
   const stt_name = request.query.stt_name;
-  const districtInfoQuery = `SELECT count(id) as anzahl, 
-  sum(visited::int) as besucht, 
-  count(id)-sum(visited::int) as unbesucht,
-  round(sum(visited::int::numeric(1,0))*100/count(id), 5) as besuchtP,
-  100-(round(sum(visited::int::numeric(1,0))*100/count(id), 5)) as unbesuchtP
-  FROM nabu.hu_koeln WHERE stt_name = $1`;
+  const districtInfoQuery = `SELECT 
+  count(a.id) as anzahl,
+  b.counter as besucht,
+  count(a.id)-b.counter as unbesucht,
+  round(b.counter::numeric*100/count(a.id),4) as besuchtP,
+  100-(round(b.counter::numeric*100/count(a.id),4)) as unbesuchtP
+  FROM nabu.koeln b, nabu.hu_koeln a
+  WHERE b.stt_name = $1 AND a.stt_name = $1
+  GROUP by b.counter;`;
   pool.query(districtInfoQuery, [stt_name], (error, results) => {
     if (error) {
       throw error
@@ -81,9 +84,10 @@ export const getChart = (request: any, response: any) => {
 
 export const getChartDistrict = (request: any, response: any) => {
   const stt_name = request.query.stt_name;
-  pool.query(`SELECT round(sum(visited::int::numeric(1,0))*100/count(id), 5) as besucht,
-  100-(round(sum(visited::int::numeric(1,0))*100/count(id), 5)) as unbesucht
-  FROM nabu.hu_koeln WHERE stt_name = $1`, [stt_name], (error, results) => {
+  pool.query(`SELECT round(b.counter::numeric*100/count(a.id),4) as besucht,
+  100-(round(b.counter::numeric*100/count(a.id),4)) as unbesucht
+  FROM nabu.koeln b, nabu.hu_koeln a
+  WHERE b.stt_name = $1 AND a.stt_name = $1 GROUP BY b.counter`, [stt_name], (error, results) => {
     if (error) {
       throw error
     }

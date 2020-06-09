@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import xmlParser from 'express-xml-bodyparser';
 import cors from 'cors';
+import path from 'path';
 import { getBoundaries, getCorona, getRange, getDistricts, getDistrictInfo, getChart, getUserHash, getMaxAffectedDistrict, getMinAffectedDistrict, getChartDistrict, updateGeoserver, getUserInfos } from './queries';
 
 dotenv.config();
@@ -22,13 +23,16 @@ app.use(cors());
 app.use(express.json({
     type: ['application/json', 'text/plain']
   }))
-
+  
 app.use(function (request, response, next) {
     response.setHeader("Access-Control-Allow-Origin", "*");
     response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,DELETE");
     response.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Access-Control-Allow-Headers, Content-Type, Authorization, Origin, Accept");
     next();
 });
+
+app.use(express.static(path.join(__dirname, 'static')));
+app.use("/static", express.static(__dirname + '/static'));
 
 app.get('/', (request: Request, response: Response) => {
     response.sendFile(__dirname + '/index.html')
